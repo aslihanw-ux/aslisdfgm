@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AR Maket</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #startButton {
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 18px 30px;
+      font-size: 18px;
+      background: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <button id="startButton">AR'yi Başlat</button>
+
+  <a-scene
+    mindar-image="
+      imageTargetSrc: ./maket.mind;
+      uiScanning: true;
+    "
+    color-space="sRGB"
+    renderer="colorManagement: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded
+  >
+
+    <a-assets>
+
+      <!-- Adam videosu -->
+      <video
+        id="adamVideo"
+        src="./adam.mp4"
+        preload="auto"
+        loop
+        playsinline
+        muted
+        crossorigin="anonymous">
+      </video>
+
+    </a-assets>
+
+
+    <!-- Kamera -->
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+
+    <!-- MAKET HEDEFİ -->
+    <a-entity mindar-image-target="targetIndex: 0">
+
+      <!--
+        Adam + sandalye videosu
+        Şimdilik beyaz arka planıyla birlikte gösterilecek.
+      -->
+
+      <a-video
+        id="adamPlane"
+        src="#adamVideo"
+        width="0.664"
+        height="1"
+        position="0 0 0.05"
+        rotation="0 0 0"
+        autoplay="false"
+        loop="true">
+      </a-video>
+
+    </a-entity>
+
+  </a-scene>
+
+
+  <script>
+
+    const video = document.querySelector("#adamVideo");
+    const button = document.querySelector("#startButton");
+
+    // Kullanıcı butona bastığında videoyu başlat
+    button.addEventListener("click", function () {
+
+      video.play();
+
+      button.style.display = "none";
+
+    });
+
+
+    // Maket algılandığında videoyu başlat
+    document.addEventListener("targetFound", function () {
+
+      video.play();
+
+    });
+
+
+    // Maket kaybolduğunda videoyu durdur
+    document.addEventListener("targetLost", function () {
+
+      video.pause();
+
+    });
+
+  </script>
+
+</body>
+</html>
