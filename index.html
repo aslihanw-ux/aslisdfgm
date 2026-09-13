@@ -44,7 +44,7 @@
   </div>
 
   <a-scene
-    mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; uiLoading: no;"
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no; uiLoading: no; filterMinCF: 0.00005; filterBeta: 0.0005; warmupTolerance: 3; missTolerance: 15; showStats: false;"
     color-space="sRGB"
     renderer="colorManagement: true, physicallyCorrectLights: true, alpha: true"
     vr-mode-ui="enabled: false"
@@ -75,8 +75,8 @@
       schema: {
         src: { type: 'map', is: 'uniform' },
         keyColor: { type: 'vec3', is: 'uniform', default: {x: 0.0, y: 1.0, z: 0.0} },
-        similarity: { type: 'number', is: 'uniform', default: 0.4 },
-        smoothness: { type: 'number', is: 'uniform', default: 0.08 }
+        similarity: { type: 'number', is: 'uniform', default: 0.55 },
+        smoothness: { type: 'number', is: 'uniform', default: 0.12 }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -96,7 +96,13 @@
           float diff = distance(texColor.rgb, keyColor);
           float alpha = smoothstep(similarity, similarity + smoothness, diff);
           if (alpha < 0.05) discard;
-          gl_FragColor = vec4(texColor.rgb, alpha);
+
+          // Despill: reduce leftover green tint on edges
+          vec3 color = texColor.rgb;
+          float spill = max(0.0, color.g - max(color.r, color.b));
+          color.g -= spill * 0.6;
+
+          gl_FragColor = vec4(color, alpha);
         }
       `
     });
