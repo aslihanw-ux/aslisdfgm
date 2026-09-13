@@ -33,6 +33,7 @@
 
   <button id="startBtn">Kamerayı Başlat</button>
   <button id="toggleUI">Ayarlar</button>
+  <div id="statusBadge" style="position:fixed;top:10px;left:10px;z-index:1000;background:rgba(0,0,0,0.6);color:#fff;padding:8px 12px;border-radius:6px;font-size:13px;">Hedef aranıyor...</div>
 
   <div class="ui-overlay" id="uiPanel">
     <div class="row"><label>X konum</label><input id="posX" type="range" min="-1" max="1" step="0.01" value="0"></div>
@@ -121,6 +122,18 @@
       video.play().catch(()=>{});
       sceneEl.systems['mindar-image-system'].start();
       startBtn.style.display = 'none';
+    });
+
+    const statusBadge = document.getElementById('statusBadge');
+    const targetEntity = document.querySelector('[mindar-image-target]');
+    targetEntity.addEventListener('targetFound', () => {
+      statusBadge.textContent = '✅ Görsel tanındı';
+      statusBadge.style.background = 'rgba(0,150,0,0.7)';
+      video.play().catch(()=>{});
+    });
+    targetEntity.addEventListener('targetLost', () => {
+      statusBadge.textContent = '🔍 Hedef aranıyor...';
+      statusBadge.style.background = 'rgba(0,0,0,0.6)';
     });
 
     // ---- Adjustment UI ----
